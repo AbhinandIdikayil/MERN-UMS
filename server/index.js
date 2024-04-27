@@ -1,7 +1,13 @@
-const express = require('express');
+import express from 'express'
 const app = express()
-require('dotenv').config()
+import {config} from 'dotenv'
+config()
 const PORT = process.env.PORT
+
+
+
+app.use('/api/user')
+app.usr('/api/admin')
 
 
 app.listen(PORT,() => {
