@@ -12,8 +12,9 @@ function App() {
       <Routes>
           {/* route for users */}
           <Route path='/' element={<UserLayout />}>
-            <Route path='' element={<Userhome />} />
+            {/* <Route path='' element={<Userhome />} /> */}
             <Route path='signup' element={<SignUp />} />
+            <Route path='' element={ <Userlogin /> } />            
             <Route path='login' element={ <Userlogin /> } />
           </Route>
 {/* ------------------------------------------------------------------------ */}

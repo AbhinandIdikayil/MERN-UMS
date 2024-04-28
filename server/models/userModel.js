@@ -1,18 +1,26 @@
 import mongoose from 'mongoose'
 
 const userSchema = mongoose.Schema({
-    username:{
-        type:string,
-        required:true
+    username: {
+        type: String,
+        required: true
     },
-    email : {
-        type:string,
-        required:true
+    email: {
+        type: String,
+        required: true
     },
-    password:{
-        type:string,
-        required:true,
+    password: {
+        type: String,
+        required: true,
+    },
+    image:{
+        publicId:{
+            type:String,
+        },
+        url:{
+            type:String
+        }
     }
-})
+}, { timestamps: true })
 
-export const user = mongoose.model('user',userSchema)
+export const userModel =  mongoose.model('user', userSchema)

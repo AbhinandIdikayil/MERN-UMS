@@ -1,15 +1,27 @@
 import express from 'express'
-const app = express()
-import {config} from 'dotenv'
+import { config } from 'dotenv'
 config()
+import { v2 as cloudinary } from 'cloudinary'
+import adminRoute from './routes/adminRoute.js'
+import userRoute from './routes/userRoute.js'
+import { dbConnect } from './config/connectoin.js'
+import cors from 'cors'
+
+
+const app = express()
+dbConnect()
+app.use(cors())
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
+
 const PORT = process.env.PORT
 
 
 
-app.use('/api/user')
-app.usr('/api/admin')
+app.use('/api/user', userRoute)
+app.use('/api/admin', adminRoute)
 
 
-app.listen(PORT,() => {
+app.listen(PORT, () => {
     console.log(`port is running on ${PORT}`)
 })
