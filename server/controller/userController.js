@@ -15,6 +15,7 @@ export const userSignup = async (req, res) => {
             username,
             email,
             password: hashedPassword,
+            image
         })
         let User = await newUser.save();
         console.log(User)
@@ -29,8 +30,8 @@ export const userLogin = async (req, res) => {
         const { email, password } = req.body;
         let userData = await userModel.findOne({ email });
         console.log(userData, req.body)
-        let encryptedPassword = await bcrypt.compare(password, userData.password)
         if (userData) {
+            let encryptedPassword = await bcrypt.compare(password, userData.password)
             if (encryptedPassword) {
                 const token = jwt.sign({ userId: userData.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
                 res.status(200).json({ success: true, message: "User Logged in successfully", token, userId: userData._id });

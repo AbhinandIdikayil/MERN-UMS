@@ -1,50 +1,77 @@
 import { useFormik, Form, Field, Formik } from 'formik'
 import * as Yup from 'yup'
-import React from 'react'
+import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
+
 
 const initialValues = {
     username: '',
     email: '',
     password: '',
-    image:''
 }
 
 const signupSchema = Yup.object().shape({
     username: Yup.string().min(2, 'morethan 2').required('username required'),
     email: Yup.string().email('invalid email').required('email required'),
     password: Yup.string().required('password required').min(4, 'min 4 required'),
-    image:Yup.mixed().required('image is required')
 })
 
 
 function Signup2() {
-    const handleSubmit = async (values,{setSubmitting}) => {
-        const getDataUri = (image) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(image);
-            reader.onloadend = () => {
-              return reader.result
-            };
+
+    const navigate = useNavigate()
+
+    const [file, setFile] = useState(null);
+    const [submitting, setSubmitting] = useState(false);
+
+    const onUpload = (e) => {
+        const uploadedFile = e.target.files[0];
+        if (uploadedFile) {
+            const validImageTypes = ['image/jpeg', 'image/png', 'image/gif'];
+            if (!validImageTypes.includes(uploadedFile.type)) {
+
+                toast.error('Invalid image format. Please select a JPEG, PNG, or GIF image.');
+                return;
+            }
+            setFile(uploadedFile);
+            return true
         }
-        let data = getDataUri(values.image)
-        let newDatas = {
-            ...values,
-            image:data
+        return false
+    };
+
+    const handleSubmit = async (values, { setSubmitting }) => {
+
+        if (file && onUpload) {
+            let imageUrl = ''
+            let imageSecureUrl = ''
+            let publicId = ''
+            let imageData = new FormData();
+            imageData.append('file', file)
+            imageData.append('upload_preset', 'fwqckd4c')
+            const res = await axios.post('https://api.cloudinary.com/v1_1/dghv07eag/image/upload', imageData, { withCredentials: false })
+            imageUrl = res.data.url;
+            imageSecureUrl = res.data.secure_url
+            publicId = res.data.public_id
+            const formDatas = {
+                ...values,
+                image: {
+                    imageUrl,
+                    imageSecureUrl,
+                    publicId
+                }
+            }
+            console.log(values, formDatas)
+            try {
+                const response = await axios.post(`${process.env.BASE_URI}api/user/signup`, formDatas)
+                if (response.data.success) {
+                    navigate('/login')
+                }
+            } catch (error) {
+                console.log(error)
+            }
+            setSubmitting(false)
         }
-        console.log(values,newDatas)
-        try {
-        const response = await axios.post(`${process.env.BASE_URI}api/user/signup`,newDatas)
-        console.log(response.data)
-            // if(response.ok){
-            //     console.log('from submitted')
-            // } else {
-            //     console.error('An error occurred while submitting the form.');
-            //   }
-        } catch (error) {
-            console.log(error)
-        }
-        setSubmitting(false)
     }
     return (
         <div style={{ height: '88vh' }} className="bg-gray-100 py-6 flex flex-col justify-center sm:py-12">
@@ -63,7 +90,7 @@ function Signup2() {
                                 validationSchema={signupSchema}
                                 onSubmit={handleSubmit}
                             >
-                                {({ errors , isSubmitting , setFieldValue }) => (
+                                {({ errors, isSubmitting }) => (
                                     <Form encType='multipart/form-data' className="py-5 text-base leading-6 space-y-4 text-gray-700 sm:text-lg sm:leading-7">
                                         <div className="relative">
 
@@ -121,24 +148,27 @@ function Signup2() {
                                         </div>
                                         <div className="relative">
 
-                                            <Field id="image"
-                                                name="image" type="file"
-                                                className="peer placeholder-transparent h-10 w-full border-b-2 border-gray-300 text-gray-900 focus:outline-none focus:borer-rose-600 bg-transparent"
+                                            <input id="image"
+                                                name="file" type="file"
+                                                className="mt-2 peer placeholder-transparent h-10 w-full border-b-2 border-gray-300 text-gray-900 focus:outline-none focus:borer-rose-600 bg-transparent"
                                                 accept='image/*'
-                                                onChange={(e) => setFieldValue('image',e.target.files[0])}
+                                                onChange={onUpload}
                                             />
-                                            <label htmlFor="image" className="absolute left-0 -top-3.5 text-gray-600 text-sm peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-440 peer-placeholder-shown:top-2 transition-all peer-focus:-top-3.5 peer-focus:text-gray-600 peer-focus:text-sm">
-                                                <span>
-                                                    {' '}
+                                            <label htmlFor="image" className="font-semibold absolute left-0 -top-3.5 text-red-600 text-sm peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-440 peer-placeholder-shown:top-2 transition-all peer-focus:-top-3.5 peer-focus:text-gray-600 peer-focus:text-sm">
+                                                <span className=''>
                                                     {
-                                                            errors?.image && (errors?.image)
+                                                        !file ? 'upload a file' : ''
                                                     }
                                                 </span>
                                             </label>
 
                                         </div>
                                         <div className="relative">
-                                            <button type='submit' disabled={isSubmitting} className="bg-blue-500 hover:bg-blue-700 text-white rounded-md px-2 py-1">Submit</button>
+                                            <button type='submit' disabled={isSubmitting} className="bg-blue-500 hover:bg-blue-700 text-white rounded-md px-2 py-1">
+                                                {
+                                                    submitting ? 'submitting' : 'submit'
+                                                }
+                                            </button>
                                         </div>
                                     </Form>
                                 )}
