@@ -7,7 +7,19 @@ import axios from 'axios'
 function SignUp() {
 
   const navigate = useNavigate()
-  const [image,setImage] = useState(null)
+  const [image, setImage] = useState(null)
+
+  const [imageBase64, setImageBase64] = useState("");
+
+  // convert image file to base64
+  const setFileToBase64 = (file) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onloadend = () => {
+      setImageBase64(reader.result);
+    };
+  };
+
 
   const { handleSubmit, register, formState: { errors, isValid }, watch } = useForm();
   const password = watch('password')
@@ -15,21 +27,37 @@ function SignUp() {
   async function formHandler(data) {
     if (isValid) {
       const formData = new FormData()
-      console.log(data)
+      console.log(data.image[0])
       formData.append("username", data.username);
       formData.append("email", data.email);
       formData.append("password", data.password);
-      formData.append('image',image)
+      formData.append("image", imageBase64)
       console.log("data from form: ", formData);
       const formDataObject = {};
+      console.log(imageBase64)
+      console.log(formData.entries())
       for (let [key, value] of formData.entries()) {
-        console.log(`${key}: ${value}`);
+        // if (key === 'image') {
+        //   formDataObject[key] = {
+        //     name: value.name,
+        //     size: value.size,
+        //     type: value.type,
+        //     lastModified: value.lastModified
+        //   }
+        // } else {
         formDataObject[key] = value;
+        // }
+
       }
 
       try {
-        console.log(process.env.BASE_URI)
-        const response = await axios.post(`${process.env.BASE_URI}api/user/signup`, formDataObject)
+        const response = await fetch(`${process.env.BASE_URI}api/user/signup`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: formData
+        })
         console.log(response)
         if (response.data.message === "Email already exists") {
           return toast.error("Email already exists");
@@ -143,6 +171,7 @@ function SignUp() {
                     onChange={(e) => {
                       const file = e.target.files[0]
                       setImage(file)
+                      setFileToBase64(file)
                     }}
                   />
                   <label htmlFor="image" className="absolute left-0 -top-3.5 text-gray-600 text-sm peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-440 peer-placeholder-shown:top-2 transition-all peer-focus:-top-3.5 peer-focus:text-gray-600 peer-focus:text-sm">

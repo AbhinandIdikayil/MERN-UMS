@@ -14,12 +14,12 @@ const userSchema = mongoose.Schema({
         required: true,
     },
     image:{
+        url:{
+            type:String
+        },
         publicId:{
             type:String,
         },
-        url:{
-            type:String
-        }
     }
 }, { timestamps: true })
 

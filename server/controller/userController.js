@@ -1,7 +1,7 @@
 import { userModel } from '../models/userModel.js'
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
-import { uploadToCloudinary } from '../services/cloudinary.js'
+
 
 
 
@@ -9,18 +9,12 @@ export const userSignup = async (req, res) => {
     try {
         const { username, email, password, image } = req.body;
         console.log(req.body)
-        let imageData = {}
-        if(image){
-            const results = await uploadToCloudinary(image,'uploads')
-            imageData = results
-        }
         const hashedPassword = await bcrypt.hash(password, 10)
         console.log(hashedPassword)
         const newUser = new userModel({
             username,
             email,
             password: hashedPassword,
-            image:imageData
         })
         let User = await newUser.save();
         console.log(User)
