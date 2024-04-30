@@ -19,14 +19,16 @@ export const authSlice = createSlice({
             state.isUserAuthenticated = false
             state.userToken = null;
         },
-        // adminLogin: (state, action) => {
-
-        // },
-        // adminLogout: (state, action) => {
-
-        // }
+        adminLogin: (state, action) => {
+            state.isAdminAuthenticated = true;
+            state.adminToken = action.payload;
+        },
+        adminLogout: (state, action) => {
+            state.isAdminAuthenticated = false
+            state.adminToken = action.payload;
+        }
     }
 })
 
-export const {  setUserLogin, setUserLogout } = authSlice.actions
+export const {adminLogin,  adminLogout, setUserLogin, setUserLogout } = authSlice.actions
 export default authSlice.reducer

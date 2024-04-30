@@ -5,7 +5,7 @@ const adminSchema = mongoose.Schema({
         type:String,
     },
     password:{
-        type:string
+        type:String
     }
 })
 

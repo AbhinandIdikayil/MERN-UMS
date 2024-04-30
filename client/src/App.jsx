@@ -1,15 +1,16 @@
 import { Routes, Route } from 'react-router-dom'
 import UserLayout from './layout/UserLayout'
 import AdminLayout from './layout/AdminLayout'
-import SignUp from './pages/user/SignUp'
 import { Userlogin } from './pages/user/Login'
 import Login from './pages/admin/Login'
+import Home from './pages/admin/Home'
 import { Userhome } from './pages/user/Home'
 import Signup2 from './pages/user/Signup2'
 import { Provider } from 'react-redux'
 import { persistor, store } from './redux/store'
 import PrivateRoute from './pages/user/PrivateRoute'
 import { PersistGate } from 'redux-persist/integration/react'
+import AdminPrivateRoute from './pages/admin/AdminPrivateRoute'
 function App() {
 
   return (
@@ -32,6 +33,11 @@ function App() {
             {/* route for admin */}
             <Route path='/admin' element={<AdminLayout />}>
               <Route path='' element={<Login />} />
+              <Route path='home' element={
+                <AdminPrivateRoute>
+                  <Home />
+                </AdminPrivateRoute>
+              } />
             </Route>
           </Routes>
         </PersistGate>
