@@ -1,10 +1,10 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Field, Form, Formik } from 'formik'
 import * as Yup from 'yup'
 import axios from 'axios'
-import {useNavigate} from 'react-router-dom'
-import {useDispatch} from 'react-redux'
-import {setUserLogin} from '../../redux/authSlice'
+import {  useNavigate } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
+import { setUserLogin } from '../../redux/authSlice'
 
 const initialValues = {
   email: '',
@@ -20,24 +20,37 @@ const loginSchema = Yup.object().shape({
 function Login() {
 
   const navigate = useNavigate()
-  const dispatch = useDispatch()  
+  const dispatch = useDispatch()
+
+  const isUserLoggedIn = useSelector((state) => state.user.isUserAuthenticated)
+
+
+  useEffect(() => {
+    if(isUserLoggedIn){
+      navigate('/home')
+    }
+  }, [])
+
 
   async function handleSubmit(values, { setSubmitting }) {
     console.log(values)
     try {
-      let response = await axios.post(`${process.env.BASE_URI}api/user/login`,values)
-      if(response){
-        const token = response.data.toekn
+      let response = await axios.post(`${process.env.BASE_URI}api/user/login`, values)
+      if (response) {
+        console.log(response.data.token)
+        const token = response.data.token
         const userid = response.data.userId
+        console.log(token)
         dispatch(setUserLogin(token))
         navigate('/home')
       }
     } catch (error) {
-      if(error.response.status === 401){
+      if (error.response) {
         console.log(error.response.message)
       }
+      console.log(error)
     }
-    
+
   }
 
 

@@ -3,6 +3,7 @@ import * as Yup from 'yup'
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
+import { useSelector } from 'react-redux'
 
 
 const initialValues = {
@@ -21,6 +22,15 @@ const signupSchema = Yup.object().shape({
 function Signup2() {
 
     const navigate = useNavigate()
+
+    const isUserLoggedIn = useSelector((state) => state.user.isUserAuthenticated)
+
+
+    useEffect(() => {
+        if (isUserLoggedIn) {
+            navigate('/home')
+        }
+    }, [])
 
     const [file, setFile] = useState(null);
     const [submitting, setSubmitting] = useState(false);

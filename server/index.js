@@ -1,23 +1,27 @@
 import express from 'express'
 import { config } from 'dotenv'
 config()
-import { v2 as cloudinary } from 'cloudinary'
 import adminRoute from './routes/adminRoute.js'
 import userRoute from './routes/userRoute.js'
 import { dbConnect } from './config/connectoin.js'
-import bodyParser from 'body-parser'
+import cookieParser from 'cookie-parser'
 import cors from 'cors'
 
 
 const app = express()
 dbConnect()
-app.use(cors())
-// app.use(bodyParser({limit:'2-mb'}))
+
+
+app.use(cors({
+    credentials:true,
+    origin: 'http://localhost:5173',
+}))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true ,limit:'100mb'}))
 
-const PORT = process.env.PORT
+app.use(cookieParser())
 
+const PORT = process.env.PORT 
 
 
 app.use('/api/user', userRoute)

@@ -3,8 +3,6 @@ import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
 
 
-
-
 export const userSignup = async (req, res) => {
     try {
         const { username, email, password, image } = req.body;
@@ -29,18 +27,52 @@ export const userLogin = async (req, res) => {
     try {
         const { email, password } = req.body;
         let userData = await userModel.findOne({ email });
-        console.log(userData, req.body)
+        console.log(userData)
         if (userData) {
             let encryptedPassword = await bcrypt.compare(password, userData.password)
             if (encryptedPassword) {
-                const token = jwt.sign({ userId: userData.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-                res.status(200).json({ success: true, message: "User Logged in successfully", token, userId: userData._id });
+                const token = jwt.sign({ userId: userData.id }, process.env.JWT_SECRET, { expiresIn: '30d' });
+                console.log(token);
+                res.cookie("userJWT", token, {
+                    httpOnly: true,
+                    secure:true,
+                    sameSite: "none",
+                    maxAge: 30 * 24 * 60 * 60 * 1000,
+                })
+                return res.status(201).json({ success: true, message: "User Logged in successfully", token, userId: userData._id });
             } else {
                 return res.status(401).json({ message: 'incorrect password' })
             }
         } else {
             return res.status(404).json({ message: 'user not found' })
         }
+    } catch (error) {
+        console.log(error)
+    }
+
+}
+
+export const userLogout = async (req, res) => {
+    try {
+        res.cookie("userJWT", "", {
+            httpOnly: true,
+            expires: new Date(0),
+          });
+          res.status(200).json({message:'user logout'})
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export const getUserDetails = async (req, res) => {
+    try {
+        let user = {
+            _id: req.user._id,
+            username: req.user.username,
+            email: req.user.email,
+            image: req.user.image.imageSecureUrl
+        }
+        return res.status(200).json({ user, success: true })
     } catch (error) {
         console.log(error)
     }
