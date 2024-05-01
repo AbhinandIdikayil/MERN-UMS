@@ -3,6 +3,7 @@ import { admin } from '../models/adminModel.js'
 import { config } from 'dotenv'
 config()
 import jwt from 'jsonwebtoken'
+import { userModel } from '../models/userModel.js'
 const credentials = {
     email: 'example@gmail.com',
     password: 'example123'
@@ -34,12 +35,30 @@ export const adminLogin = async (req, res) => {
 }
 export const adminLogout = async (req, res) => {
     try {
-        res.cookie('adminJWT',{
-            httpOnly:true,
-            expires:new Date(0)
+        res.cookie('adminJWT', {
+            httpOnly: true,
+            expires: new Date(0)
         })
-        return res.status(200).json({message:'user logoutuot successfully'})
+        return res.status(200).json({ message: 'user logoutuot successfully' })
     } catch (error) {
         console.log(error)
     }
 }
+
+export const getUsers = async (req, res) => {
+    try {
+        const users = await userModel.find().select('-password')
+        return res.status(200).json({users,success:true})
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export const addUser = async (req, res) => {
+    try {
+
+    } catch (error) {
+        console.log(error)
+    }
+}
+

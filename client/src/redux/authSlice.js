@@ -25,7 +25,7 @@ export const authSlice = createSlice({
         },
         adminLogout: (state, action) => {
             state.isAdminAuthenticated = false
-            state.adminToken = action.payload;
+            state.adminToken = null;
         }
     }
 })

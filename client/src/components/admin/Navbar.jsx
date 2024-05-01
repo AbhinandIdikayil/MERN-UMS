@@ -1,14 +1,19 @@
 import axios from 'axios'
 import React from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { Link, NavLink } from 'react-router-dom'
+import { adminLogout } from '../../redux/authSlice'
 
 function Navbar() {
+  const dispatch = useDispatch()
   const isUserLoggedIn = useSelector((state) => state.user.isAdminAuthenticated)
   console.log(isUserLoggedIn)
   async function handleAdminLogout() {
     try {
       const response = await axios.post(`${process.env.BASE_URI}api/admin/logout`)
+      if (response.data) {
+        dispatch(adminLogout())
+      }
     } catch (error) {
       console.log(error)
     }
@@ -23,13 +28,22 @@ function Navbar() {
       <div>
         {
           isUserLoggedIn ? (
-            <button
-              onClick={handleAdminLogout}
-              to={''}
-              style={{ border: '1px solid' }}
-              className='nav-bar uppercase px-4 py-2 border-black mr-5 font-semibold text-black rounded-md hover:bg-blue-500/90 hover:text-zinc-50 duration-100'>
-              Logout
-            </button>
+            <>
+              <NavLink
+                to={'home/add'}
+                style={{ border: '1px solid' }}
+                className='nav-bar uppercase px-4 py-2 border-black mr-5 font-semibold text-black rounded-md hover:bg-blue-500/90 hover:text-zinc-50 duration-100'>
+                add user
+              </NavLink>
+              <button
+                onClick={handleAdminLogout}
+                to={''}
+                style={{ border: '1px solid' }}
+                className='nav-bar uppercase px-4 py-2 border-black mr-5 font-semibold text-black rounded-md hover:bg-blue-500/90 hover:text-zinc-50 duration-100'>
+                Logout
+              </button>
+
+            </>
           ) : (
             <NavLink
               to={''}
