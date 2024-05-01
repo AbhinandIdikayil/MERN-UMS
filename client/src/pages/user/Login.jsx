@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react'
 import { Field, Form, Formik } from 'formik'
 import * as Yup from 'yup'
-import axios from 'axios'
-import {  useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify'
+import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { setUserLogin } from '../../redux/authSlice'
 
@@ -26,7 +26,7 @@ function Login() {
 
 
   useEffect(() => {
-    if(isUserLoggedIn){
+    if (isUserLoggedIn) {
       navigate('/home')
     }
   }, [])
@@ -35,19 +35,26 @@ function Login() {
   async function handleSubmit(values, { setSubmitting }) {
     console.log(values)
     try {
-      let response = await axios.post(`${process.env.BASE_URI}api/user/login`, values)
-      if (response) {
-        console.log(response.data.token)
-        const token = response.data.token
-        const userid = response.data.userId
-        console.log(token)
-        dispatch(setUserLogin(token))
-        navigate('/home')
+      let response = await fetch(`${process.env.BASE_URI}api/user/login`, {
+        method: 'POST',
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
+        credentials: 'include'
+      })
+      if (response.ok) {
+        const data = await response.json()
+        if (data.success) {
+          const token = data.token
+          dispatch(setUserLogin(token))
+          navigate('/home')
+        }
+      }
+      if (response.status === 401) {
+        toast.error('wrong password')
       }
     } catch (error) {
-      if (error.response) {
-        console.log(error.response.message)
-      }
       console.log(error)
     }
 

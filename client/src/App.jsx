@@ -4,6 +4,7 @@ import AdminLayout from './layout/AdminLayout'
 import { Userlogin } from './pages/user/Login'
 import Login from './pages/admin/Login'
 import Home from './pages/admin/Home'
+import { ToastContainer, toast } from 'react-toastify'
 import { Userhome } from './pages/user/Home'
 import Signup2 from './pages/user/Signup2'
 import { Provider } from 'react-redux'
@@ -12,12 +13,14 @@ import PrivateRoute from './pages/user/PrivateRoute'
 import { PersistGate } from 'redux-persist/integration/react'
 import AdminPrivateRoute from './pages/admin/AdminPrivateRoute'
 import AddUser from './pages/admin/AddUser'
+import EditUser from './components/admin/EditUser'
 function App() {
 
   return (
     <>
       <Provider store={store}>
         <PersistGate loading={null} persistor={persistor}>
+            <ToastContainer />
           <Routes>
             {/* route for users */}
             <Route path='/' element={<UserLayout />}>
@@ -37,6 +40,7 @@ function App() {
               <Route path='home' element={<AdminPrivateRoute />}>
                 <Route path='' element={<Home />} />
                 <Route path='add' element={<AddUser />} />
+                <Route path='edit/:userId' element={<EditUser />} />
               </Route>
             </Route>
           </Routes>

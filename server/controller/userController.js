@@ -26,16 +26,16 @@ export const userSignup = async (req, res) => {
 export const userLogin = async (req, res) => {
     try {
         const { email, password } = req.body;
+        console.log(password)
         let userData = await userModel.findOne({ email });
-        console.log(userData)
+        console.log('from login')
         if (userData) {
             let encryptedPassword = await bcrypt.compare(password, userData.password)
+            console.log(encryptedPassword)
             if (encryptedPassword) {
                 const token = jwt.sign({ userId: userData.id }, process.env.JWT_SECRET, { expiresIn: '30d' });
-                console.log(token);
                 res.cookie("userJWT", token, {
                     httpOnly: true,
-                    secure:true,
                     sameSite: "none",
                     maxAge: 30 * 24 * 60 * 60 * 1000,
                 })
@@ -54,11 +54,12 @@ export const userLogin = async (req, res) => {
 
 export const userLogout = async (req, res) => {
     try {
-        res.cookie("userJWT", "", {
-            httpOnly: true,
-            expires: new Date(0),
-          });
-          res.status(200).json({message:'user logout'})
+        // res.cookie('userJWT', {
+        //     httpOnly: true,
+        //     expires: new Date(0)
+        // })
+        res.clearCookie('userJWT')
+        res.status(200).json({ message: 'user logout' })
     } catch (error) {
         console.log(error)
     }
@@ -66,11 +67,12 @@ export const userLogout = async (req, res) => {
 
 export const getUserDetails = async (req, res) => {
     try {
+        console.log(req.user)
         let user = {
-            _id: req.user._id,
-            username: req.user.username,
-            email: req.user.email,
-            image: req.user.image.imageSecureUrl
+            _id: req?.user?._id,
+            username: req?.user?.username,
+            email: req?.user?.email,
+            image: req?.user?.image?.imageSecureUrl
         }
         return res.status(200).json({ user, success: true })
     } catch (error) {

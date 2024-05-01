@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { TbEdit } from "react-icons/tb";
-import { RiDeleteBin2Fill } from "react-icons/ri";
-import { NavLink } from 'react-router-dom';
-import moment from 'moment'
 import axios from 'axios';
+import UserListing from '../../components/admin/UserListing';
 
 function Home() {
 
@@ -20,10 +17,8 @@ function Home() {
     fetchUsers()
   }, [])
 
-  function formattedDate(dateString) {
-    const dateObj = moment(dateString);
-    const formattedDate = dateObj.format("MMM Do, YYYY")
-    return <span>{formattedDate}</span>
+  function removeUser(id) {
+    setUsers(users.filter(data => data._id != id))
   }
 
   return (
@@ -70,62 +65,11 @@ function Home() {
             </thead>
             <tbody>
               {users.map((data, ind) => (
-                <tr key={data?._id}>
-                  <td className="px-5 py-5 border-b border-gray-500  text-sm">
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0 w-10 h-10">
-                        <img className="w-full h-full rounded-full"
-                          src={`${data?.image?.imageUrl}`}
-                          alt="" />
-                      </div>
-                      <div className="ml-3">
-                        <p className="text-gray-900 whitespace-no-wrap">
-                          {data?.username}
-                        </p>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-5 py-5 border-b border-gray-500  text-sm">
-                    <p className="text-gray-900 whitespace-no-wrap">{data?.email}</p>
-                  </td>
-                  <td className="px-5 py-5 border-b border-gray-500  text-sm">
-                    <p className="text-gray-900 whitespace-no-wrap">
-                      {formattedDate()}
-                    </p>
-                  </td>
-                  <td className="px-5 py-5 border-b border-gray-500 text-sm">
-                    <span className='flex gap-4 items-center'>
-                      <NavLink to={`edit/${data._id}`}>
-                        <TbEdit size={20} className='text-black' />
-                      </NavLink>
-                      <button to={''}>
-                        <RiDeleteBin2Fill size={20} className='text-black' />
-                      </button>
-                    </span>
-                  </td>
-                </tr>
+                  <UserListing key={data?._id} user={data} onDelete={removeUser} />
               ))}
-
-
 
             </tbody>
           </table>
-          {/* <div
-                        className="px-5 py-5 bg-white border-t flex flex-col xs:flex-row items-center xs:justify-between          ">
-                        <span className="text-xs xs:text-sm text-gray-900">
-                            Showing 1 to 4 of 50 Entries
-                        </span>
-                        <div className="inline-flex mt-2 xs:mt-0">
-                            <button
-                                className="text-sm bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-l">
-                                Prev
-                            </button>
-                            <button
-                                className="text-sm bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-r">
-                                Next
-                            </button>
-                        </div>
-                    </div> */}
         </div>
       </div>
 

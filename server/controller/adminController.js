@@ -4,10 +4,7 @@ import { config } from 'dotenv'
 config()
 import jwt from 'jsonwebtoken'
 import { userModel } from '../models/userModel.js'
-const credentials = {
-    email: 'example@gmail.com',
-    password: 'example123'
-}
+import bcrypt from 'bcrypt'
 
 export const adminLogin = async (req, res) => {
     try {
@@ -18,7 +15,6 @@ export const adminLogin = async (req, res) => {
                 const token = jwt.sign({ adminId: adminData.id }, process.env.JWT_SECRET, { expiresIn: '30d' });
                 res.cookie('adminJWT', {
                     httpOnly: true,
-                    secure: true,
                     sameSite: "none",
                     maxAge: 30 * 24 * 60 * 60 * 1000,
                 })
@@ -35,10 +31,11 @@ export const adminLogin = async (req, res) => {
 }
 export const adminLogout = async (req, res) => {
     try {
-        res.cookie('adminJWT', {
-            httpOnly: true,
-            expires: new Date(0)
-        })
+        // res.cookie('adminJWT', {
+        //     httpOnly: true,
+        //     expires: new Date(0)
+        // })
+        res.clearCookie('adminJWT')
         return res.status(200).json({ message: 'user logoutuot successfully' })
     } catch (error) {
         console.log(error)
@@ -48,7 +45,7 @@ export const adminLogout = async (req, res) => {
 export const getUsers = async (req, res) => {
     try {
         const users = await userModel.find().select('-password')
-        return res.status(200).json({users,success:true})
+        return res.status(200).json({ users, success: true })
     } catch (error) {
         console.log(error)
     }
@@ -56,7 +53,32 @@ export const getUsers = async (req, res) => {
 
 export const addUser = async (req, res) => {
     try {
+        const { username, email, password, image } = req.body;
+        const existingUser = await userModel.find({email}).select('-password')
+        if(existingUser){
+            return res.status(409).json({error:'email already exists'})
+        }
+        const hashedPassword = await bcrypt.hash(password, 10)
+        const newUser = new userModel({
+            username,
+            email,
+            password: hashedPassword,
+            image
+        })
+        let User = await newUser.save();
+        return res.status(200).json({ success: true, message: 'user created successfully' })
+    } catch (error) {
+        console.log(error)
+    }
+}
 
+export const deleteUser = async (req, res) => {
+    try {
+        const { id } = req.body;
+        const deletedUser = await userModel.findByIdAndDelete(id)
+        if (deletedUser) {
+            return res.status(200).json({ success: true })
+        }
     } catch (error) {
         console.log(error)
     }

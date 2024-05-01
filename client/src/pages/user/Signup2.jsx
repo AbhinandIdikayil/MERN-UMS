@@ -2,6 +2,7 @@ import { useFormik, Form, Field, Formik } from 'formik'
 import * as Yup from 'yup'
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import{ toast} from 'react-toastify'
 import axios from 'axios'
 import { useSelector } from 'react-redux'
 
@@ -38,7 +39,7 @@ function Signup2() {
     const onUpload = (e) => {
         const uploadedFile = e.target.files[0];
         if (uploadedFile) {
-            const validImageTypes = ['image/jpeg', 'image/png', 'image/gif'];
+            const validImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/jpg'];
             if (!validImageTypes.includes(uploadedFile.type)) {
 
                 toast.error('Invalid image format. Please select a JPEG, PNG, or GIF image.');

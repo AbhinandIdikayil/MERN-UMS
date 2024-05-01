@@ -1,25 +1,78 @@
 import { Formik, Form, Field } from 'formik'
-import React from 'react'
+import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import * as Yup from 'yup'
-import { PhotoIcon, UserCircleIcon } from '@heroicons/react/24/solid'
+import {  toast } from 'react-toastify'
+import 'react-toastify/ReactToastify.css'
+import axios from 'axios'
 
 const initialValues = {
     username: '',
     email: '',
     password: '',
-    image: ''
 }
 
 const addUserSchema = Yup.object().shape({
     username: Yup.string().required('username is required'),
     email: Yup.string().required('email is required').email('invalid email'),
     password: Yup.string().required('password is required').min(4, 'min 4 len'),
-    image: Yup.mixed().required('image is required')
 })
 
 function AddUser() {
-    function handleSubmit(values) {
 
+    const navigate = useNavigate()
+    const [file, setFile] = useState(null);
+
+    const onUpload = (e) => {
+        console.log('hasdfd')
+        const uploadedFile = e.target.files[0];
+        if (uploadedFile) {
+            const validImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/jpg']
+            if (!validImageTypes.includes(uploadedFile.type)) {
+                console.log('hii')
+                toast.error('Invalid image format', { position: toast.POSITION.TOP_RIGHT, })
+                return false;
+            }
+            setFile(uploadedFile);
+            return true;
+        }
+        return false
+    }
+
+    async function handleSubmit(values, { setSubmitting }) {
+        console.log(file)
+        if (file) {
+            let imageUrl = ''
+            let publicId = ''
+            let imageData = new FormData();
+            imageData.append('file', file)
+            imageData.append('upload_preset', 'fwqckd4c');
+            console.log(imageData)
+            const res = await axios.post('https://api.cloudinary.com/v1_1/dghv07eag/image/upload', imageData, { withCredentials: false })
+            imageUrl = res.data.url
+            publicId = res.data.public_id
+            const formDatas = {
+                ...values,
+                image: {
+                    imageUrl,
+                    publicId
+                }
+            }
+            console.log(values, formDatas);
+            try {
+                const response = await axios.post(`${process.env.BASE_URI}api/admin/add`, formDatas)
+                console.log(response.data)
+                if (response.data.success) {
+                    return navigate('/admin/home')
+                }
+            } catch (error) {
+                if (error.response.status === 409) {
+                    toast.error('email already exist')
+                }
+                console.log(error)
+            }
+            setSubmitting(false)
+        }
     }
     return (
         <div style={{ height: '88vh' }} className="bg-gray-100 py-6 flex flex-col justify-center sm:py-12">
@@ -67,25 +120,29 @@ function AddUser() {
                                                 </span>
                                             </label>
                                         </div>
-                                        <div className="col-span-full">
-                                        <label htmlFor="photo" className="block text-sm font-medium leading-6 text-gray-900">
-                                            Photo
-                                        </label>
-                                        <div className="mt-2 flex items-center gap-x-3">
-                                            <UserCircleIcon className="h-12 w-12 text-gray-300" aria-hidden="true" />
-                                            <button
-                                                type="button"
-                                                className="rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-                                            >
-                                                Change
-                                            </button>
+
+                                        <div className="relative">
+
+                                            <input id="image"
+                                                name="file" type="file"
+                                                className="mt-2 peer placeholder-transparent h-10 w-full border-b-2 border-gray-300 text-gray-900 focus:outline-none focus:borer-rose-600 bg-transparent"
+                                                accept='image/*'
+                                                onChange={onUpload}
+                                            />
+                                            <label htmlFor="image" className="font-semibold absolute left-0 -top-3.5 text-red-600 text-sm peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-440 peer-placeholder-shown:top-2 transition-all peer-focus:-top-3.5 peer-focus:text-gray-600 peer-focus:text-sm">
+                                                <span className=''>
+                                                    {
+                                                        !file ? 'upload a image' : ''
+                                                    }
+                                                </span>
+                                            </label>
+
                                         </div>
-                                    </div>
                                         <div className="relative">
                                             <button type='submit' className=" bg-zinc-900 text-white rounded-md px-2 py-1 hover:bg-zinc-950">Submit</button>
                                         </div>
                                     </div>
-                                   
+
                                 </Form>
                             )}
 
