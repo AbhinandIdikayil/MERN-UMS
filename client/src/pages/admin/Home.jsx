@@ -5,6 +5,11 @@ import UserListing from '../../components/admin/UserListing';
 function Home() {
 
   const [users, setUsers] = useState([]);
+  const [searchUser,setSearchUser] = useState('')
+
+  useEffect(() => {
+    fetchUsers()
+  }, [])
 
   async function fetchUsers() {
     const response = await axios.get(`${process.env.BASE_URI}api/admin/home`);
@@ -13,13 +18,17 @@ function Home() {
     }
   }
 
-  useEffect(() => {
-    fetchUsers()
-  }, [])
+  function handleSearching(e) {
+      setSearchUser(e.target.value)
+  }
 
   function removeUser(id) {
     setUsers(users.filter(data => data._id != id))
   }
+
+
+  const filteredUser = users.filter((user) => user.username.toLowerCase().includes(searchUser.toLowerCase()) )
+
 
   return (
     <div style={{ height: '88vh' }} className="bg-gray-100 py-6 sm:py-12 sm:px-20">
@@ -37,6 +46,8 @@ function Home() {
             </svg>
           </span>
           <input placeholder="Search"
+          value={searchUser}
+          onChange={handleSearching}
             className="appearance-none rounded-r rounded-l  border border-gray-400 border-b block pl-8 pr-6 py-2 w-full bg-white text-sm placeholder-gray-400 text-gray-700 focus:bg-white focus:placeholder-gray-600 focus:text-gray-700 focus:outline-none" />
         </div>
       </div>
@@ -64,10 +75,15 @@ function Home() {
               </tr>
             </thead>
             <tbody>
-              {users.map((data, ind) => (
-                  <UserListing key={data?._id} user={data} onDelete={removeUser} />
-              ))}
+              {
+                filteredUser.length > 0 ? filteredUser.map((data) => (
 
+                  <UserListing key={data?._id} user={data} onDelete={removeUser} />
+                )) :  <tr className='text-black text-lg font-bold text-center'>
+                    No users found
+                  </tr>
+              }
+            
             </tbody>
           </table>
         </div>
