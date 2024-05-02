@@ -1,4 +1,3 @@
-import mongoose from 'mongoose'
 import { admin } from '../models/adminModel.js'
 import { config } from 'dotenv'
 config()
@@ -54,9 +53,9 @@ export const getUsers = async (req, res) => {
 export const addUser = async (req, res) => {
     try {
         const { username, email, password, image } = req.body;
-        const existingUser = await userModel.find({email}).select('-password')
-        if(existingUser){
-            return res.status(409).json({error:'email already exists'})
+        const existingUser = await userModel.find({ email }).select('-password')
+        if (existingUser) {
+            return res.status(409).json({ error: 'email already exists' })
         }
         const hashedPassword = await bcrypt.hash(password, 10)
         const newUser = new userModel({
@@ -81,6 +80,24 @@ export const deleteUser = async (req, res) => {
         }
     } catch (error) {
         console.log(error)
+    }
+}
+
+export const getSingleUser = async (req,res) => {
+    try {
+        const {userID} = req.params
+        const userData = await userModel.findById(userID)
+        return res.status(200).json({success:true,userData})
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export const editUser = async (req, res) => {
+    try {
+
+    } catch (error) {
+
     }
 }
 

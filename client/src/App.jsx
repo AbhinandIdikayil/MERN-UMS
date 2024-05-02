@@ -14,24 +14,25 @@ import { PersistGate } from 'redux-persist/integration/react'
 import AdminPrivateRoute from './pages/admin/AdminPrivateRoute'
 import AddUser from './pages/admin/AddUser'
 import EditUser from './components/admin/EditUser'
+import Profile from './pages/user/Profile'
 function App() {
 
   return (
     <>
       <Provider store={store}>
         <PersistGate loading={null} persistor={persistor}>
-            <ToastContainer />
+          <ToastContainer />
           <Routes>
             {/* route for users */}
             <Route path='/' element={<UserLayout />}>
               <Route path='signup' element={<Signup2 />} />
               <Route path='' element={<Userlogin />} />
               <Route path='login' element={<Userlogin />} />
-              <Route path='home' element={
-                <PrivateRoute>
-                  <Userhome />
-                </PrivateRoute>
-              } />
+              <Route path='home' element={<PrivateRoute />}>
+                <Route path='' element={<Userhome />} />
+                <Route path='profile/:userId' element={<Profile />} />
+              </Route>
+
             </Route>
             {/* ------------------------------------------------------------------------ */}
             {/* route for admin */}

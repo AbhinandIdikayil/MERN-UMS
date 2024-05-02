@@ -36,10 +36,10 @@ export const userLogin = async (req, res) => {
                 const token = jwt.sign({ userId: userData.id }, process.env.JWT_SECRET, { expiresIn: '30d' });
                 res.cookie("userJWT", token, {
                     httpOnly: true,
-                    sameSite: "none",
+                    sameSite: "lax",
                     maxAge: 30 * 24 * 60 * 60 * 1000,
                 })
-                return res.status(201).json({ success: true, message: "User Logged in successfully", token, userId: userData._id });
+                return res.status(200).json({ success: true, message: "User Logged in successfully", token, userId: userData._id });
             } else {
                 return res.status(401).json({ message: 'incorrect password' })
             }
@@ -79,3 +79,54 @@ export const getUserDetails = async (req, res) => {
         console.log(error)
     }
 }
+
+export const getSingleUser = async (req, res) => {
+    try {
+        console.log(req.user)
+        let user = {
+            _id: req?.user?._id,
+            username: req?.user?.username,
+            email: req?.user?.email,
+            image: req?.user?.image
+        }
+        return res.status(200).json({ user, success: true })
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export const editProfile = async (req, res) => {
+    try {
+        const { userID } = req.params
+        const { username, image } = req.body;
+
+        if (username && image) {
+            const user = await userModel.findByIdAndUpdate(userID,
+                {
+                    $set : {username , image}
+                }
+            )
+            return res.status(200).json({ user, success: true })
+        } else if (username) {
+            const user = await userModel.findByIdAndUpdate(userID,
+                {
+                    $set:{username}
+                },
+                {new :true}
+            )
+            return res.status(200).json({ user, success: true })
+        } else {
+            const user = await userModel.findByIdAndUpdate(
+                userID,
+                {
+                    $set: { image }
+                },
+                { new: true }
+            )
+            return res.status(200).json({ user, success: true })
+        }
+    } catch (error) {
+        console.log(error)
+    }
+}
+

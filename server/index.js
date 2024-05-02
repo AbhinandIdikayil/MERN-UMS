@@ -13,15 +13,17 @@ dbConnect()
 
 
 app.use(cors({
-    credentials:true,
-    origin: 'http://localhost:5173',
-}))
-app.use(express.json())
-app.use(express.urlencoded({ extended: true ,limit:'100mb'}))
+    origin: 'http://localhost:5173', // Allow requests from this origin
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed HTTP methods
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'], // Allowed headers
+    credentials: true // Allow cookies to be sent with requests
+}));
 
+app.use(express.json())
+app.use(express.urlencoded({ extended: true, limit: '100mb' }))
 app.use(cookieParser())
 
-const PORT = process.env.PORT 
+const PORT = process.env.PORT
 
 
 app.use('/api/user', userRoute)

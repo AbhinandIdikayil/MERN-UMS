@@ -22,6 +22,7 @@ function AddUser() {
 
     const navigate = useNavigate()
     const [file, setFile] = useState(null);
+    const [isSubmit,setIsSubmit] = useState(false)
 
     const onUpload = (e) => {
         console.log('hasdfd')
@@ -39,9 +40,14 @@ function AddUser() {
         return false
     }
 
+    function showSubmiting () {
+
+    }
+
     async function handleSubmit(values, { setSubmitting }) {
         console.log(file)
         if (file) {
+            setIsSubmit(true);
             let imageUrl = ''
             let publicId = ''
             let imageData = new FormData();
@@ -63,9 +69,11 @@ function AddUser() {
                 const response = await axios.post(`${process.env.BASE_URI}api/admin/add`, formDatas)
                 console.log(response.data)
                 if (response.data.success) {
+                    setIsSubmit(false);
                     return navigate('/admin/home')
                 }
             } catch (error) {
+                setIsSubmit(false);
                 if (error.response.status === 409) {
                     toast.error('email already exist')
                 }
@@ -139,7 +147,10 @@ function AddUser() {
 
                                         </div>
                                         <div className="relative">
-                                            <button type='submit' className=" bg-zinc-900 text-white rounded-md px-2 py-1 hover:bg-zinc-950">Submit</button>
+                                            <button type='submit' className=" bg-zinc-900 text-white rounded-md px-2 py-1 hover:bg-zinc-950">
+                                                {isSubmit ? 'submiting' : 'submit'}
+                                                
+                                            </button>
                                         </div>
                                     </div>
 
