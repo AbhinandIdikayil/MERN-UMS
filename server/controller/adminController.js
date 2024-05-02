@@ -95,9 +95,23 @@ export const getSingleUser = async (req,res) => {
 
 export const editUser = async (req, res) => {
     try {
-
+        const {userID} = req.params
+        const { username,email,image } = req.body
+        if(userID){
+            const user = await userModel.findByIdAndUpdate(
+                userID,
+                {
+                    $set:{username,email,image}
+                },
+                {
+                    new : true
+                }
+            )
+            console.log(user)
+            return res.status(200).json({success:true})
+        }
     } catch (error) {
-
+        console.log(error)
     }
 }
 
