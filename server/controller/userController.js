@@ -103,16 +103,16 @@ export const editProfile = async (req, res) => {
         if (username && image) {
             const user = await userModel.findByIdAndUpdate(userID,
                 {
-                    $set : {username , image}
+                    $set: { username, image }
                 }
             )
             return res.status(200).json({ user, success: true })
         } else if (username) {
             const user = await userModel.findByIdAndUpdate(userID,
                 {
-                    $set:{username}
+                    $set: { username }
                 },
-                {new :true}
+                { new: true }
             )
             return res.status(200).json({ user, success: true })
         } else {

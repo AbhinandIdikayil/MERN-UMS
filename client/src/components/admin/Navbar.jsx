@@ -10,8 +10,11 @@ function Navbar() {
   console.log(isUserLoggedIn)
   async function handleAdminLogout() {
     try {
-      const response = await axios.post(`${process.env.BASE_URI}api/admin/logout`)
-      if (response.data) {
+      const response = await fetch(`${process.env.BASE_URI}api/admin/logout`,{
+        method:'POST',
+        credentials:'include'
+      })
+      if (response.ok) {
         dispatch(adminLogout())
       }
     } catch (error) {

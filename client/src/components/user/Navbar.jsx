@@ -12,7 +12,10 @@ function Navbar() {
   async function handleLogout() {
     try {
       dispatch(setUserLogout())
-      let response = await axios.post(`${process.env.BASE_URI}api/user/logout`);
+      let response = await fetch(`${process.env.BASE_URI}api/user/logout`,{
+        method:'POST',
+        credentials:'include'
+      });
       console.log('hii')
       if (response.data.success) {
 
