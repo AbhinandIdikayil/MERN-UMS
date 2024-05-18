@@ -4,6 +4,7 @@ import { TbEdit } from "react-icons/tb";
 import { RiDeleteBin2Fill } from "react-icons/ri";
 import { NavLink } from 'react-router-dom';
 import axios from 'axios';
+import { useMutation } from '@tanstack/react-query'
 
 function formattedDate(dateString) {
     const dateObj = moment(dateString);
@@ -11,15 +12,32 @@ function formattedDate(dateString) {
     return <span>{formattedDate}</span>
 }
 
-function UserListing({ user , onDelete}) {
+function UserListing({ user, onDelete }) {
+
+    const deleteUserMutation = useMutation({
+        mutationFn: async (id) => {
+            let response = await axios.delete(`${process.env.BASE_URI}api/admin/delete`, { data: { id } })
+            console.log(response.data)
+            return response.data
+        },
+        onSuccess:(data) =>  {
+            if(data.success){
+                onDelete.refetch()
+            }
+        },
+        onError:(error) => {
+            console.log(error)
+        }
+    })
 
     const deleteUser = async (id) => {
         try {
             console.log(id)
-            const response = await axios.delete(`${process.env.BASE_URI}api/admin/delete`,{data:{id}});
-            if(response.data.success){
-                onDelete(id);
-            }
+            deleteUserMutation.mutate(id)
+            // const response = await axios.delete(`${process.env.BASE_URI}api/admin/delete`, { data: { id } });
+            // if (response.data.success) {
+            //     onDelete(id);
+            // }
         } catch (error) {
             console.log(error)
         }

@@ -77,7 +77,7 @@ export const deleteUser = async (req, res) => {
         const { id } = req.body;
         const deletedUser = await userModel.findByIdAndDelete(id)
         if (deletedUser) {
-            return res.status(200).json({ success: true })
+            return res.status(200).json({ success: true})
         }
     } catch (error) {
         console.log(error)

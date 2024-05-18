@@ -30,7 +30,6 @@ function Home() {
 
   const users = fetchUsersQuery.data
 
-
   // useEffect(() => {
   //   fetchUsers()
   // }, [])
@@ -47,7 +46,8 @@ function Home() {
   }
 
   function removeUser(id) {
-    setUsers(users.filter(data => data._id != id))
+    console.log(id)
+    users.filter((data) => data._id !== id)
   }
 
 
@@ -102,7 +102,7 @@ function Home() {
               {
                 filteredUser.length > 0 ? filteredUser.map((data) => (
 
-                  <UserListing key={data?._id} user={data} onDelete={removeUser} />
+                  <UserListing key={data?._id} user={data} onDelete={fetchUsersQuery} />
                 )) : <tr className='text-black text-lg font-bold text-center'>
                   No users found
                 </tr>
