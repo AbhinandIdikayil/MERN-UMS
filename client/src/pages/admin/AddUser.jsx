@@ -13,7 +13,8 @@ const initialValues = {
 }
 
 const addUserSchema = Yup.object().shape({
-    username: Yup.string().required('username is required'),
+    username: Yup.string().required('username is required').matches(/^([A-Za-z\u00C0-\u00D6\u00D8-\u00f6\u00f8-\u00ff\s]*)$/gi,
+    'Name can only contain Latin letters.'),
     email: Yup.string().required('email is required').email('invalid email'),
     password: Yup.string().required('password is required').min(4, 'min 4 len'),
 })

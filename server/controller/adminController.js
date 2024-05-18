@@ -53,7 +53,8 @@ export const getUsers = async (req, res) => {
 export const addUser = async (req, res) => {
     try {
         const { username, email, password, image } = req.body;
-        const existingUser = await userModel.find({ email }).select('-password')
+        const existingUser = await userModel.findOne({ email }).select('-password')
+        console.log(existingUser);
         if (existingUser) {
             return res.status(409).json({ error: 'email already exists' })
         }

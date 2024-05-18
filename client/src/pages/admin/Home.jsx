@@ -1,25 +1,49 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios';
 import UserListing from '../../components/admin/UserListing';
+import { useQuery } from '@tanstack/react-query'
+
 
 function Home() {
 
-  const [users, setUsers] = useState([]);
-  const [searchUser,setSearchUser] = useState('')
+  // const [users, setUsers] = useState([]);
+  const [searchUser, setSearchUser] = useState('')
 
-  useEffect(() => {
-    fetchUsers()
-  }, [])
+  const fetchUsersQuery = useQuery({queryKey:['users'],
+    queryFn:async () => {
+      try {
+        const response = await axios.get(`${process.env.BASE_URI}api/admin/home`);
+        return response.data.users
+      } catch (error) {
+        console.log(error)
+      }
+    },}
+  )
 
-  async function fetchUsers() {
-    const response = await axios.get(`${process.env.BASE_URI}api/admin/home`);
-    if (response.data) {
-      setUsers(response.data.users)
-    }
+  if (fetchUsersQuery.isLoading) {
+    return <div>Loading users...</div>;
   }
 
+  if (fetchUsersQuery.isError) {
+    return <div>Error: {fetchUsersQuery.error.message}</div>;
+  }
+
+  const users = fetchUsersQuery.data
+
+
+  // useEffect(() => {
+  //   fetchUsers()
+  // }, [])
+
+  // async function fetchUsers() {
+  //   const response = await axios.get(`${process.env.BASE_URI}api/admin/home`);
+  //   if (response.data) {
+  //     setUsers(response.data.users)
+  //   }
+  // }
+
   function handleSearching(e) {
-      setSearchUser(e.target.value)
+    setSearchUser(e.target.value)
   }
 
   function removeUser(id) {
@@ -27,7 +51,7 @@ function Home() {
   }
 
 
-  const filteredUser = users.filter((user) => user.username.toLowerCase().includes(searchUser.toLowerCase()) )
+  const filteredUser = users.filter((user) => user.username.toLowerCase().includes(searchUser.toLowerCase()))
 
 
   return (
@@ -46,8 +70,8 @@ function Home() {
             </svg>
           </span>
           <input placeholder="Search"
-          value={searchUser}
-          onChange={handleSearching}
+            value={searchUser}
+            onChange={handleSearching}
             className="appearance-none rounded-r rounded-l  border border-gray-400 border-b block pl-8 pr-6 py-2 w-full bg-white text-sm placeholder-gray-400 text-gray-700 focus:bg-white focus:placeholder-gray-600 focus:text-gray-700 focus:outline-none" />
         </div>
       </div>
@@ -79,11 +103,11 @@ function Home() {
                 filteredUser.length > 0 ? filteredUser.map((data) => (
 
                   <UserListing key={data?._id} user={data} onDelete={removeUser} />
-                )) :  <tr className='text-black text-lg font-bold text-center'>
-                    No users found
-                  </tr>
+                )) : <tr className='text-black text-lg font-bold text-center'>
+                  No users found
+                </tr>
               }
-            
+
             </tbody>
           </table>
         </div>

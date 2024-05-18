@@ -16,9 +16,9 @@ import AddUser from './pages/admin/AddUser'
 import EditUser from './components/admin/EditUser'
 import Profile from './pages/user/Profile'
 function App() {
-
   return (
     <>
+
       <Provider store={store}>
         <PersistGate loading={null} persistor={persistor}>
           <ToastContainer />
